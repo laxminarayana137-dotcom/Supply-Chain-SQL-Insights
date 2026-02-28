@@ -1,0 +1,27 @@
+WITH avg_time AS (
+    SELECT AVG(`Shipping times`) AS avg_ship
+    FROM supply_chain_data9
+)
+
+SELECT
+    Location,
+    SUM(`Number of products sold`) AS total_demand,
+    SUM(
+        CASE 
+            WHEN `Shipping times` > avg_ship THEN 1
+            ELSE 0
+        END
+    ) AS delay_count,
+    ROUND(
+        SUM(
+            CASE 
+                WHEN `Shipping times` > avg_ship THEN 1
+                ELSE 0
+            END
+        ) * 100.0 / COUNT(*), 2
+    ) AS delay_rate
+FROM supply_chain_data9, avg_time
+GROUP BY Location
+ORDER BY delay_rate DESC;
+
+
